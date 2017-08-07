@@ -50,7 +50,7 @@ namespace NexGenRoadLoader.loaders
                 }
 
                 // Get feature cursor of utrans roads to loop through 
-                const string getUtransRoads = "WHERE STREETNAME = 'STATE'";
+                const string getUtransRoads = "WHERE STREETNAME = 'MAIN'";
 
                 var roadsFilter = new QueryFilter
                 {
@@ -75,9 +75,6 @@ namespace NexGenRoadLoader.loaders
                         InsertFeatureIntoFeatureClass.Execute(roadFeature, outputFeatureClass, _zips, _muni, _counties, _addrSystem);
                     }
                 }
-
-
-
             }
             catch (Exception e)
             {

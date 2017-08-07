@@ -46,8 +46,30 @@ namespace NexGenRoadLoader.commands
                 string DOT_HWYNAM = utransFeature.get_Value(utransFeature.Fields.FindField("HWYNAME")).ToString().Trim();
                 string DOT_RTNAME = utransFeature.get_Value(utransFeature.Fields.FindField("DOT_RTNAME")).ToString().Trim();
                 string DOT_RTPART = utransFeature.get_Value(utransFeature.Fields.FindField("DOT_RTPART")).ToString().Trim();
-                int DOT_F_MILE = Convert.ToInt32(utransFeature.get_Value(utransFeature.Fields.FindField("DOT_F_MILE")));
-                int DOT_T_MILE = Convert.ToInt32(utransFeature.get_Value(utransFeature.Fields.FindField("DOT_T_MILE")));
+                var DOT_F_MILE = utransFeature.get_Value(utransFeature.Fields.FindField("DOT_F_MILE"));
+                var DOT_T_MILE = utransFeature.get_Value(utransFeature.Fields.FindField("DOT_T_MILE"));
+                string DOT_FCLASS = utransFeature.get_Value(utransFeature.Fields.FindField("CLASS")).ToString().Trim();
+                string DOT_SRFTYP = utransFeature.get_Value(utransFeature.Fields.FindField("SURFTYPE")).ToString().Trim();
+                string DOT_CLASS = "";
+                string DOT_OWN_L = "";
+                //var DOT_OWN_R;
+                //var DOT_AADT; // int
+                string DOT_AADTYR = "";
+                //var DOT_THRULANES; // small int
+                string BIKE_L = utransFeature.get_Value(utransFeature.Fields.FindField("BIKE_L")).ToString().Trim();
+                string BIKE_R = utransFeature.get_Value(utransFeature.Fields.FindField("BIKE_R")).ToString().Trim();
+                string BIKE_PLN_L = utransFeature.get_Value(utransFeature.Fields.FindField("BIKE_STATUS")).ToString().Trim();
+                string BIKE_PLN_R = utransFeature.get_Value(utransFeature.Fields.FindField("BIKE_STATUS")).ToString().Trim();
+                string BIKE_NOTES = utransFeature.get_Value(utransFeature.Fields.FindField("BIKE_NOTES")).ToString().Trim();
+                string UNIQUE_ID = utransFeature.get_Value(utransFeature.Fields.FindField("UNIQUE_ID")).ToString().Trim();
+                string LOCAL_UID = utransFeature.get_Value(utransFeature.Fields.FindField("LOCALID")).ToString().Trim();
+                string UTAHRD_UID = "";
+                string SOURCE = utransFeature.get_Value(utransFeature.Fields.FindField("SOURCE")).ToString().Trim();
+                var UPDATED = utransFeature.get_Value(utransFeature.Fields.FindField("MODIFYDATE")); //date field
+                //var EFFECTIVE; //date field
+                //var EXPIRE; //date field
+                string CUSTOMTAGS = "";
+
 
                 // Concatinate FullName field
                 string FULLNAME = String.Empty;
@@ -115,6 +137,22 @@ namespace NexGenRoadLoader.commands
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_RTPART"), DOT_RTPART);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_F_MILE"), DOT_F_MILE);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_T_MILE"), DOT_T_MILE);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_FCLASS"), DOT_FCLASS);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_SRFTYP"), DOT_SRFTYP);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_CLASS"), DOT_CLASS);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_OWN_L"), DOT_OWN_L);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_AADTYR"), DOT_AADTYR);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("BIKE_L"), BIKE_L);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("BIKE_R"), BIKE_R);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("BIKE_PLN_L"), BIKE_PLN_L);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("BIKE_PLN_R"), BIKE_PLN_R);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("BIKE_NOTES"), BIKE_NOTES);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("UNIQUE_ID"), UNIQUE_ID);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("LOCAL_UID"), LOCAL_UID);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("UTAHRD_UID"), UTAHRD_UID);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("SOURCE"), SOURCE);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("UPDATED"), UPDATED);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("CUSTOMTAGS"), CUSTOMTAGS);
 
                     // Populate spatial assigned NextGenRoads' fields.
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("ZIPCODE_L"), spatialValues.Zip_L);
@@ -133,8 +171,6 @@ namespace NexGenRoadLoader.commands
                     // Store the feature.
                     newNexGenFeature.Store();
                 }
-
-
             }
             catch (Exception ex)
             {
