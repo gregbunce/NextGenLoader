@@ -18,15 +18,17 @@ namespace NexGenRoadLoader.loaders
         private readonly IFeatureClass _muni;
         private readonly IFeatureClass _counties;
         private readonly IFeatureClass _addrSystem;
+        private readonly IFeatureClass _metroTwnShp;
 
         // The roads and clioptions get passed in here - this is the class constructor.
-        public NextGenLoader(IFeatureClass source, IFeatureClass zips, IFeatureClass muni, IFeatureClass counties, IFeatureClass addrSys, CliOptions options)
+        public NextGenLoader(IFeatureClass source, IFeatureClass zips, IFeatureClass muni, IFeatureClass counties, IFeatureClass addrSys, IFeatureClass metroTwnShp, CliOptions options)
         {
             _roads = source;
             _zips = zips;
             _muni = muni;
             _counties = counties;
             _addrSystem = addrSys;
+            _metroTwnShp = metroTwnShp;
             _options = options;
         }
 
@@ -50,7 +52,8 @@ namespace NexGenRoadLoader.loaders
                 }
 
                 // Get feature cursor of utrans roads to loop through 
-                const string getUtransRoads = "WHERE STREETNAME = 'MAIN'";
+                //const string getUtransRoads = "WHERE STREETNAME = 'DONNER' or STREETNAME = 'EMIGRATION CANYON' or STREETNAME = 'CANYON'";
+                const string getUtransRoads = "WHERE COFIPS = '49035'";
 
                 var roadsFilter = new QueryFilter
                 {
@@ -69,10 +72,13 @@ namespace NexGenRoadLoader.loaders
 
                     IFeature roadFeature;
 
+                    int counter = 0;
                     // loop through the sgid roads' feature cursor
                     while ((roadFeature = roadsCursor.NextFeature()) != null)
                     {
-                        InsertFeatureIntoFeatureClass.Execute(roadFeature, outputFeatureClass, _zips, _muni, _counties, _addrSystem);
+                        counter = counter + 1;
+                        Console.WriteLine(counter);
+                        InsertFeatureIntoFeatureClass.Execute(roadFeature, outputFeatureClass, _zips, _muni, _counties, _addrSystem, _metroTwnShp);
                     }
                 }
             }
@@ -89,7 +95,7 @@ namespace NexGenRoadLoader.loaders
         public IWorkspace GetOutputWorkspace()
         {
             IWorkspaceFactory workspaceFactory = new FileGDBWorkspaceFactory();
-            IWorkspace workspace = workspaceFactory.OpenFromFile(_options.OutputGeodatabase + "NexGenRoadLoader.gdb", 0);
+            IWorkspace workspace = workspaceFactory.OpenFromFile(_options.OutputGeodatabase + "NextGenRoadLoader.gdb", 0);
             //IFeatureWorkspace pFeatureWorkspace = (IFeatureWorkspace)pWorkspace;
             return workspace;
         }

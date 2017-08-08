@@ -7,7 +7,7 @@ namespace NexGenRoadLoader.commands
 {
     public static class InsertFeatureIntoFeatureClass
     {
-        public static void Execute(IFeature utransFeature, IFeatureClass nextGenFeatureClass, IFeatureClass zipsFC, IFeatureClass muniFC, IFeatureClass countiesFC, IFeatureClass addrSystemFC)
+        public static void Execute(IFeature utransFeature, IFeatureClass nextGenFeatureClass, IFeatureClass zipsFC, IFeatureClass muniFC, IFeatureClass countiesFC, IFeatureClass addrSystemFC, IFeatureClass metroTownship)
         {
             try
             {
@@ -48,11 +48,9 @@ namespace NexGenRoadLoader.commands
                 string DOT_RTPART = utransFeature.get_Value(utransFeature.Fields.FindField("DOT_RTPART")).ToString().Trim();
                 var DOT_F_MILE = utransFeature.get_Value(utransFeature.Fields.FindField("DOT_F_MILE"));
                 var DOT_T_MILE = utransFeature.get_Value(utransFeature.Fields.FindField("DOT_T_MILE"));
-                string DOT_FCLASS = utransFeature.get_Value(utransFeature.Fields.FindField("CLASS")).ToString().Trim();
+                //string DOT_FCLASS = utransFeature.get_Value(utransFeature.Fields.FindField("CLASS")).ToString().Trim();
                 string DOT_SRFTYP = utransFeature.get_Value(utransFeature.Fields.FindField("SURFTYPE")).ToString().Trim();
-                string DOT_CLASS = "";
-                string DOT_OWN_L = "";
-                //var DOT_OWN_R;
+                string DOT_CLASS = utransFeature.get_Value(utransFeature.Fields.FindField("CLASS")).ToString().Trim();
                 //var DOT_AADT; // int
                 string DOT_AADTYR = "";
                 //var DOT_THRULANES; // small int
@@ -102,8 +100,37 @@ namespace NexGenRoadLoader.commands
                 }
 
                 // Get values for the spatial fields by calling the method to spatially assign it.
-                using (var spatialValues = GetSpatialFieldValues.Execute(utransFeature, zipsFC, muniFC, countiesFC, addrSystemFC)){
-                
+                using (var spatialValues = GetSpatialFieldValues.Execute(utransFeature, zipsFC, muniFC, countiesFC, addrSystemFC, metroTownship)){
+
+                    // Get values for fields that need aditional logic.
+                    string DOT_OWN_L = "";
+                    string DOT_OWN_R = "";
+                    // Get first four characters from DOT_RTNAME and convert them int.
+                    if (DOT_RTNAME.Length >= 4)
+                    {
+                        int DOT_RTNAME_Fisrt4int = Convert.ToInt32(DOT_RTNAME.Substring(0, 4));
+
+                        // Get values for the DOT_OWN fields.
+                        if (DOT_RTNAME_Fisrt4int >= 6 || DOT_RTNAME_Fisrt4int < 1000)
+                        {
+                            DOT_OWN_L = "UDOT";
+                            DOT_OWN_R = "UDOT";
+                        }
+                        else if (DOT_RTNAME_Fisrt4int >= 1000 || DOT_RTNAME_Fisrt4int < 4000)
+                        {
+                            if (DOT_CLASS == "B")
+                            {
+                                DOT_OWN_L = spatialValues.County_L;
+                                DOT_OWN_R = spatialValues.County_R;                           
+                            }
+                            else if (DOT_CLASS == "C")
+                            {
+                                DOT_OWN_L = spatialValues.IncMuni_L;
+                                DOT_OWN_R = spatialValues.IncMuni_R;
+                            }
+                        }                        
+                    }
+
                     // Populate the non-spatial NextGenRoads' fields.
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("STATUS"), STATUS);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("CARTOCODE"), CARTOCODE);
@@ -137,10 +164,11 @@ namespace NexGenRoadLoader.commands
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_RTPART"), DOT_RTPART);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_F_MILE"), DOT_F_MILE);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_T_MILE"), DOT_T_MILE);
-                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_FCLASS"), DOT_FCLASS);
+                    //newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_FCLASS"), DOT_FCLASS);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_SRFTYP"), DOT_SRFTYP);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_CLASS"), DOT_CLASS);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_OWN_L"), DOT_OWN_L);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_OWN_R"), DOT_OWN_R);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_AADTYR"), DOT_AADTYR);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("BIKE_L"), BIKE_L);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("BIKE_R"), BIKE_R);
@@ -161,12 +189,17 @@ namespace NexGenRoadLoader.commands
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("POSTCOMM_R"), spatialValues.PostalComm_R);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("INCMUNI_L"), spatialValues.IncMuni_L);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("INCMUNI_R"), spatialValues.IncMuni_R);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("UNINCCOM_L"), spatialValues.UnIncMuni_L);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("UNINCCOM_R"), spatialValues.UnIncMuni_R);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("COUNTY_L"), spatialValues.County_L);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("COUNTY_R"), spatialValues.County_R);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("ADDRSYS_L"), spatialValues.AddrSystem_L);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("ADDRSYS_R"), spatialValues.AddrSystem_R);
-                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("QUADRANT"), spatialValues.AddrSystemQuad_L); // we have a AddrSystemQuad_R i just need a NG schema roads field to populate.
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("QUADRANT_L"), spatialValues.AddrSystemQuad_L);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("QUADRANT_R"), spatialValues.AddrSystemQuad_R);
 
+                    // Log the OID to the console.
+                    Console.WriteLine(utransFeature.get_Value(utransFeature.Fields.FindField("OBJECTID")).ToString());
 
                     // Store the feature.
                     newNexGenFeature.Store();

@@ -42,6 +42,7 @@ namespace NexGenRoadLoader
             const string sgidMuniBoundaries = "SGID10.BOUNDARIES.Municipalities";
             const string sgidAddressSystems = "SGID10.LOCATION.AddressSystemQuadrants";
             const string sgidCounties = "SGID10.BOUNDARIES.Counties";
+            const string sgidMetroTownships = "SGID10.BOUNDARIES.MetroTownships";
 
             var start = Stopwatch.StartNew();
 
@@ -128,6 +129,10 @@ namespace NexGenRoadLoader
                     var addrSystems = sgidFeatureWorkspace.OpenFeatureClass(sgidAddressSystems);
                     releaser.ManageLifetime(addrSystems);
 
+                    // GET SGID METROTOWNSHIPS
+                    var metroTwnShp = sgidFeatureWorkspace.OpenFeatureClass(sgidMetroTownships);
+                    releaser.ManageLifetime(metroTwnShp);
+
                 //}
 
 
@@ -137,7 +142,7 @@ namespace NexGenRoadLoader
                     case OutputType.NextGenRoads:
                     {
                         // Create an new instance of the NexGenRoadsLoader
-                        loader = new NextGenLoader(roads, zips, muni, counties, addrSystems, options); 
+                        loader = new NextGenLoader(roads, zips, muni, counties, addrSystems, metroTwnShp, options); 
                         break;
                     }
 

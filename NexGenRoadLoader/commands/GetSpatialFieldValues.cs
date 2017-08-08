@@ -11,7 +11,7 @@ namespace NexGenRoadLoader.commands
 {
     class GetSpatialFieldValues
     {
-        public static SpatialFieldValues Execute(IFeature utransFeature, IFeatureClass zipsFeatClass, IFeatureClass muniFeatClass, IFeatureClass countyFeatClass, IFeatureClass addrSysFeatClass)
+        public static SpatialFieldValues Execute(IFeature utransFeature, IFeatureClass zipsFeatClass, IFeatureClass muniFeatClass, IFeatureClass countyFeatClass, IFeatureClass addrSysFeatClass, IFeatureClass metroTwnShp)
         {
             try
             {
@@ -217,7 +217,7 @@ namespace NexGenRoadLoader.commands
                     spatialFieldValues.AddrSystem_R =
                         arcFeatureAddrSystem_right.get_Value(arcFeatureAddrSystem_right.Fields.FindField("GRID_NAME")).ToString().Trim();
                     spatialFieldValues.AddrSystemQuad_R =
-                        arcFeatureAddrSystem_left.get_Value(arcFeatureAddrSystem_left.Fields.FindField("QUADRANT")).ToString().Trim();
+                        arcFeatureAddrSystem_right.get_Value(arcFeatureAddrSystem_right.Fields.FindField("QUADRANT")).ToString().Trim();
                 }
                 else
                 {
@@ -228,6 +228,57 @@ namespace NexGenRoadLoader.commands
                 // release the cursor
                 System.Runtime.InteropServices.Marshal.ReleaseComObject(addrSystemFeatureCursor_right);
                 System.Runtime.InteropServices.Marshal.ReleaseComObject(arcSpatialFilter_rightAddrSystem);
+
+
+                // check if we're in Salt Lake County, if so check for metro townships
+                if (utransFeature.get_Value(utransFeature.Fields.FindField("COFIPS")).ToString().Trim() == "49035")
+                {
+                    // it's in salt lake county - check for metro townships
+                    // LEFT - METO TOWNSHIP
+                    ISpatialFilter arcSpatialFilter_leftMetroTwnShp = new SpatialFilter();
+                    arcSpatialFilter_leftMetroTwnShp.Geometry = outPoint_negLeft;
+                    arcSpatialFilter_leftMetroTwnShp.SpatialRel = esriSpatialRelEnum.esriSpatialRelIntersects;
+
+                    IFeatureCursor metroTwnShpFeatureCursor_left = metroTwnShp.Search(arcSpatialFilter_leftMetroTwnShp, false);
+                    IFeature arcFeatureMetroTwn_left = metroTwnShpFeatureCursor_left.NextFeature();
+                    if (arcFeatureMetroTwn_left != null)
+                    {
+                        spatialFieldValues.UnIncMuni_L =
+                            arcFeatureMetroTwn_left.get_Value(arcFeatureMetroTwn_left.Fields.FindField("SHORTDESC")).ToString().Trim().ToUpper();
+
+                    }
+                    else
+                    {
+                        spatialFieldValues.UnIncMuni_L = "";
+
+                    }
+                    //clear out variables
+                    // release the cursor
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(metroTwnShpFeatureCursor_left);
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(arcSpatialFilter_leftMetroTwnShp);
+
+                    // RIGHT - METO TOWNSHIP
+                    ISpatialFilter arcSpatialFilter_rightMetroTwnShp = new SpatialFilter();
+                    arcSpatialFilter_rightMetroTwnShp.Geometry = outPoint_posRight;
+                    arcSpatialFilter_rightMetroTwnShp.SpatialRel = esriSpatialRelEnum.esriSpatialRelIntersects;
+
+                    IFeatureCursor metroTwnShpFeatureCursor_right = metroTwnShp.Search(arcSpatialFilter_rightMetroTwnShp, false);
+                    IFeature arcFeatureMetroTwn_right = metroTwnShpFeatureCursor_right.NextFeature();
+                    if (arcFeatureMetroTwn_right != null)
+                    {
+                        spatialFieldValues.UnIncMuni_R =
+                            arcFeatureMetroTwn_right.get_Value(arcFeatureMetroTwn_right.Fields.FindField("SHORTDESC")).ToString().Trim().ToUpper();
+
+                    }
+                    else
+                    {
+                        spatialFieldValues.UnIncMuni_R = "";
+                    }
+                    //clear out variables
+                    // release the cursor
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(metroTwnShpFeatureCursor_right);
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(arcSpatialFilter_rightMetroTwnShp);
+                }
 
 
                 // destroy spatial filters.
