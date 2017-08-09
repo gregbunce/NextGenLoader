@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using ESRI.ArcGIS.Geometry;
 using ESRI.ArcGIS.Geodatabase;
@@ -7,13 +8,13 @@ namespace NexGenRoadLoader.commands
 {
     public static class InsertFeatureIntoFeatureClass
     {
-        public static void Execute(IFeature utransFeature, IFeatureClass nextGenFeatureClass, IFeatureClass zipsFC, IFeatureClass muniFC, IFeatureClass countiesFC, IFeatureClass addrSystemFC, IFeatureClass metroTownship)
+        public static void Execute(IFeature utransFeature, IFeatureClass nextGenFeatureClass, IFeatureClass zipsFC, IFeatureClass muniFC, IFeatureClass countiesFC, IFeatureClass addrSystemFC, IFeatureClass metroTownship, StreamWriter streamWriter)
         {
+
+            var newNexGenFeature = nextGenFeatureClass.CreateFeature();
             try
             {
-                var newNexGenFeature = nextGenFeatureClass.CreateFeature();
                 var utransShape = utransFeature.ShapeCopy;
-
                 newNexGenFeature.Shape = utransShape;
 
                 // Set values for fields that don't need spatial assigning.
@@ -99,6 +100,27 @@ namespace NexGenRoadLoader.commands
                     }
                 }
 
+                // check for bad ACCESS code values in utrans before push
+                if (ACCESSCODE != "A" && ACCESSCODE != "F" && ACCESSCODE != "G" && ACCESSCODE != "S" && ACCESSCODE != "T" && ACCESSCODE != "")
+                {
+                    // Must be a bad value...
+                    if (ACCESSCODE == "2T")
+                    {
+                        // limited, two wheel drive
+                        ACCESSCODE = "*";
+                    }
+                    else if (ACCESSCODE == "1")
+                    {
+                        // 1 = no restrictions
+                        ACCESSCODE = "";
+                    }
+                    else
+                    {
+                        ACCESSCODE = "*";        
+                    }
+                }
+
+
                 // Get values for the spatial fields by calling the method to spatially assign it.
                 using (var spatialValues = GetSpatialFieldValues.Execute(utransFeature, zipsFC, muniFC, countiesFC, addrSystemFC, metroTownship)){
 
@@ -166,7 +188,14 @@ namespace NexGenRoadLoader.commands
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_T_MILE"), DOT_T_MILE);
                     //newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_FCLASS"), DOT_FCLASS);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_SRFTYP"), DOT_SRFTYP);
-                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_CLASS"), DOT_CLASS);
+                    if (DOT_CLASS.Length == 1)
+                    {
+                        newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_CLASS"), DOT_CLASS);                       
+                    }
+                    else if (DOT_CLASS.Length > 1)
+                    {
+                        newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_CLASS"), "*");                            
+                    }
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_OWN_L"), DOT_OWN_L);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_OWN_R"), DOT_OWN_R);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_AADTYR"), DOT_AADTYR);
@@ -210,7 +239,8 @@ namespace NexGenRoadLoader.commands
                 Console.WriteLine(
                     "There was an error with InsertFeatureInto method." +
                     ex.Message + " " + ex.Source + " " + ex.InnerException + " " + ex.HResult + " " + ex.StackTrace + " " + ex);
-                Console.ReadLine();
+                //Console.ReadLine();
+                streamWriter.WriteLine(utransFeature.get_Value(utransFeature.Fields.FindField("OBJECTID")).ToString() + "," + newNexGenFeature.get_Value(newNexGenFeature.Fields.FindField("OBJECTID")));
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using ESRI.ArcGIS.ADF;
 using ESRI.ArcGIS.DataSourcesGDB;
@@ -38,6 +39,13 @@ namespace NexGenRoadLoader.loaders
         {
             Console.WriteLine("Begin creating loading roads to nexgen fgdb: " + DateTime.Now);
 
+            //setup a file stream and a stream writer to write out the addresses that do not have a nearby street or a street out of range
+            string path = @"C:\temp\NextGenRoadLoaderErrReport" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm") + ".txt";
+            FileStream fileStream = new FileStream(path, FileMode.Create);
+            StreamWriter streamWriter = new StreamWriter(fileStream);
+            streamWriter.WriteLine("UtransOID" + "," + "NexyGenOID");
+            int intUniqueID = 0;
+
             try
             {
                 var outputFeatureWorkspace = (IFeatureWorkspace)output;
@@ -53,7 +61,7 @@ namespace NexGenRoadLoader.loaders
 
                 // Get feature cursor of utrans roads to loop through 
                 //const string getUtransRoads = "WHERE STREETNAME = 'DONNER' or STREETNAME = 'EMIGRATION CANYON' or STREETNAME = 'CANYON'";
-                const string getUtransRoads = "WHERE COFIPS = '49035'";
+                const string getUtransRoads = "WHERE CARTOCODE <> '99'";
 
                 var roadsFilter = new QueryFilter
                 {
@@ -78,9 +86,12 @@ namespace NexGenRoadLoader.loaders
                     {
                         counter = counter + 1;
                         Console.WriteLine(counter);
-                        InsertFeatureIntoFeatureClass.Execute(roadFeature, outputFeatureClass, _zips, _muni, _counties, _addrSystem, _metroTwnShp);
+                        InsertFeatureIntoFeatureClass.Execute(roadFeature, outputFeatureClass, _zips, _muni, _counties, _addrSystem, _metroTwnShp, streamWriter);
                     }
                 }
+
+                //close the stream writer
+                streamWriter.Close();
             }
             catch (Exception e)
             {
