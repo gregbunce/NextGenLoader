@@ -40,10 +40,10 @@ namespace NexGenRoadLoader.loaders
             Console.WriteLine("Begin creating loading roads to nexgen fgdb: " + DateTime.Now);
 
             //setup a file stream and a stream writer to write out the addresses that do not have a nearby street or a street out of range
-            string path = @"C:\temp\NextGenRoadLoaderErrReport" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm") + ".txt";
+            string path = @"C:\temp\NGRoadLoadrErrReprt" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm") + ".txt";
             FileStream fileStream = new FileStream(path, FileMode.Create);
             StreamWriter streamWriter = new StreamWriter(fileStream);
-            streamWriter.WriteLine("UtransOID" + "," + "NexyGenOID");
+            streamWriter.WriteLine("UtransOID" + "," + "NextGenOID");
             int intUniqueID = 0;
 
             try

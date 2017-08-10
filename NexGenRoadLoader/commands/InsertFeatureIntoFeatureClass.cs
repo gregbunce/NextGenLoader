@@ -42,7 +42,13 @@ namespace NexGenRoadLoader.commands
                 string STATE_R = "UT";
                 string ONEWAY = utransFeature.get_Value(utransFeature.Fields.FindField("ONEWAY")).ToString().Trim();
                 string VERT_LEVEL = utransFeature.get_Value(utransFeature.Fields.FindField("VERTLEVEL")).ToString().Trim();
-                int SPEED_LMT = Convert.ToInt32(utransFeature.get_Value(utransFeature.Fields.FindField("SPEED")));
+                // check for dbnull values.
+                var SPEED_LMT = utransFeature.get_Value(utransFeature.Fields.FindField("SPEED"));
+                //if (SPEED_LMT != null)
+                //{
+                //    // Convert the value to int
+                //    SPEED_LMT = Convert.ToInt32(utransFeature.get_Value(utransFeature.Fields.FindField("SPEED")));  
+                //}
                 string ACCESSCODE = utransFeature.get_Value(utransFeature.Fields.FindField("ACCESS")).ToString().Trim();
                 string DOT_HWYNAM = utransFeature.get_Value(utransFeature.Fields.FindField("HWYNAME")).ToString().Trim();
                 string DOT_RTNAME = utransFeature.get_Value(utransFeature.Fields.FindField("DOT_RTNAME")).ToString().Trim();
@@ -120,7 +126,6 @@ namespace NexGenRoadLoader.commands
                     }
                 }
 
-
                 // Get values for the spatial fields by calling the method to spatially assign it.
                 using (var spatialValues = GetSpatialFieldValues.Execute(utransFeature, zipsFC, muniFC, countiesFC, addrSystemFC, metroTownship)){
 
@@ -130,27 +135,53 @@ namespace NexGenRoadLoader.commands
                     // Get first four characters from DOT_RTNAME and convert them int.
                     if (DOT_RTNAME.Length >= 4)
                     {
-                        int DOT_RTNAME_Fisrt4int = Convert.ToInt32(DOT_RTNAME.Substring(0, 4));
+                        // Get first four characters
+                        string DOT_RTNAME_First4string = DOT_RTNAME.Substring(0, 4);
 
-                        // Get values for the DOT_OWN fields.
-                        if (DOT_RTNAME_Fisrt4int >= 6 || DOT_RTNAME_Fisrt4int < 1000)
+                        // See if first four characters are int
+                        //int DOT_RTNAME_Fisrt4int = Convert.ToInt32(DOT_RTNAME.Substring(0, 4));
+                        int DOT_RTNAME_Fisrt4int;
+                        bool first4isNumeric = int.TryParse(DOT_RTNAME_First4string, out DOT_RTNAME_Fisrt4int);
+
+                        // If first four characters are int then...
+                        if (first4isNumeric)
                         {
-                            DOT_OWN_L = "UDOT";
-                            DOT_OWN_R = "UDOT";
+                            // first four are int.
+                            // Get values for the DOT_OWN fields.
+                            if (DOT_RTNAME_Fisrt4int >= 6 || DOT_RTNAME_Fisrt4int < 1000)
+                            {
+                                DOT_OWN_L = "UDOT";
+                                DOT_OWN_R = "UDOT";
+                            }
+                            else if (DOT_RTNAME_Fisrt4int >= 1000 || DOT_RTNAME_Fisrt4int < 4000)
+                            {
+                                if (DOT_CLASS == "B")
+                                {
+                                    DOT_OWN_L = spatialValues.County_L;
+                                    DOT_OWN_R = spatialValues.County_R;                           
+                                }
+                                else if (DOT_CLASS == "C")
+                                {
+                                    DOT_OWN_L = spatialValues.IncMuni_L;
+                                    DOT_OWN_R = spatialValues.IncMuni_R;
+                                }
+                            }  
                         }
-                        else if (DOT_RTNAME_Fisrt4int >= 1000 || DOT_RTNAME_Fisrt4int < 4000)
+                        else
                         {
-                            if (DOT_CLASS == "B")
+                            // first four are not int.
+                            // check for know outliers
+                            if (DOT_RTNAME_First4string == "089AP")
                             {
-                                DOT_OWN_L = spatialValues.County_L;
-                                DOT_OWN_R = spatialValues.County_R;                           
+                                DOT_OWN_L = "UDOT";
+                                DOT_OWN_R = "UDOT";                                  
                             }
-                            else if (DOT_CLASS == "C")
+                            else
                             {
-                                DOT_OWN_L = spatialValues.IncMuni_L;
-                                DOT_OWN_R = spatialValues.IncMuni_R;
+                                DOT_OWN_L = "*";
+                                DOT_OWN_R = "*";                                    
                             }
-                        }                        
+                        }
                     }
 
                     // Populate the non-spatial NextGenRoads' fields.
