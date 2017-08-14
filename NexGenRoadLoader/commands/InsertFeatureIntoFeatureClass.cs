@@ -67,7 +67,7 @@ namespace NexGenRoadLoader.commands
                 string BIKE_PLN_R = utransFeature.get_Value(utransFeature.Fields.FindField("BIKE_STATUS")).ToString().Trim();
                 string BIKE_NOTES = utransFeature.get_Value(utransFeature.Fields.FindField("BIKE_NOTES")).ToString().Trim();
                 string UNIQUE_ID = utransFeature.get_Value(utransFeature.Fields.FindField("UNIQUE_ID")).ToString().Trim();
-                string LOCAL_UID = utransFeature.get_Value(utransFeature.Fields.FindField("LOCALID")).ToString().Trim();
+                string LOCAL_UID = utransFeature.get_Value(utransFeature.Fields.FindField("COUNIQUE")).ToString().Trim();
                 string UTAHRD_UID = "";
                 string SOURCE = utransFeature.get_Value(utransFeature.Fields.FindField("SOURCE")).ToString().Trim();
                 var UPDATED = utransFeature.get_Value(utransFeature.Fields.FindField("MODIFYDATE")); //date field
