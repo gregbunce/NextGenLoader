@@ -80,9 +80,9 @@ namespace NexGenRoadLoader.commands
                 if (arcFeatureZip_right != null)
                 {
                     spatialFieldValues.Zip_R =
-                        arcFeatureZip_left.get_Value(arcFeatureZip_left.Fields.FindField("ZIP5")).ToString().Trim();
-                    spatialFieldValues.PostalComm_R = arcFeatureZip_left
-                        .get_Value(arcFeatureZip_left.Fields.FindField("NAME")).ToString().Trim().ToUpper();
+                        arcFeatureZip_right.get_Value(arcFeatureZip_right.Fields.FindField("ZIP5")).ToString().Trim();
+                    spatialFieldValues.PostalComm_R = arcFeatureZip_right
+                        .get_Value(arcFeatureZip_right.Fields.FindField("NAME")).ToString().Trim().ToUpper();
                 }
                 else
                 {
