@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using ESRI.ArcGIS.Geometry;
 using ESRI.ArcGIS.Geodatabase;
 
@@ -78,12 +79,8 @@ namespace NexGenRoadLoader.commands
 
                 // Concatinate FullName field
                 string FULLNAME = String.Empty;
-                if (NAME.Any(x => !char.IsLetter(x))) // True if it doesn't contain letters.
-                {
-                    // ACS FULLNAME
-                    FULLNAME = NAME + " " + POSTDIR;
-                }
-                else
+                //if (NAME.Any(x => !char.IsLetter(x))) // True if it doesn't contain letters.
+                if (Regex.IsMatch(NAME, @"[a-zA-Z]")) // true if NAME conatins at least one letter
                 {
                     // ALPHA FULLNAME
                     // CHECK IF HIGHWAY, IF SO..
@@ -91,7 +88,7 @@ namespace NexGenRoadLoader.commands
                     {
                         if (DOT_HWYNAM != "")
                         {
-                            FULLNAME = DOT_HWYNAM;   
+                            FULLNAME = DOT_HWYNAM;
                         }
                         else
                         {
@@ -102,8 +99,13 @@ namespace NexGenRoadLoader.commands
                     }
                     else
                     {
-                        FULLNAME = NAME + " " + POSTTYPE;                             
+                        FULLNAME = NAME + " " + POSTTYPE;
                     }
+                }
+                else
+                {
+                    // ACS FULLNAME
+                    FULLNAME = NAME + " " + POSTDIR;
                 }
 
                 // check for bad ACCESS code values in utrans before push
