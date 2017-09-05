@@ -79,34 +79,38 @@ namespace NexGenRoadLoader.commands
 
                 // Concatinate FullName field
                 string FULLNAME = String.Empty;
-                //if (NAME.Any(x => !char.IsLetter(x))) // True if it doesn't contain letters.
-                if (Regex.IsMatch(NAME, @"[a-zA-Z]")) // true if NAME conatins at least one letter
+                if (NAME != "")
                 {
-                    // ALPHA FULLNAME
-                    // CHECK IF HIGHWAY, IF SO..
-                    if (NAME.Contains("HIGHWAY "))
+                    //if (NAME.Any(x => !char.IsLetter(x))) // True if it doesn't contain letters.  - old code
+                    if (Regex.IsMatch(NAME, @"[a-zA-Z]")) // true if NAME conatins at least one letter
                     {
-                        if (DOT_HWYNAM != "")
+                        // ALPHA FULLNAME
+                        // CHECK IF HIGHWAY, IF SO..
+                        if (NAME.Contains("HIGHWAY "))
                         {
-                            FULLNAME = DOT_HWYNAM;
+                            if (DOT_HWYNAM != "")
+                            {
+                                FULLNAME = DOT_HWYNAM;
+                            }
+                            else
+                            {
+                                FULLNAME = NAME;
+                                // Replace HIGHWAY WITH HWY.
+                                FULLNAME = FULLNAME.Replace("HIGHWAY", "HWY");
+                            }
                         }
                         else
                         {
-                            FULLNAME = NAME;
-                            // Replace HIGHWAY WITH HWY.
-                            FULLNAME = FULLNAME.Replace("HIGHWAY", "HWY");
+                            FULLNAME = NAME + " " + POSTTYPE;
                         }
                     }
                     else
                     {
-                        FULLNAME = NAME + " " + POSTTYPE;
-                    }
+                        // ACS FULLNAME
+                        FULLNAME = NAME + " " + POSTDIR;
+                    }                    
                 }
-                else
-                {
-                    // ACS FULLNAME
-                    FULLNAME = NAME + " " + POSTDIR;
-                }
+
 
                 // check for bad ACCESS code values in utrans before push
                 if (ACCESSCODE != "A" && ACCESSCODE != "F" && ACCESSCODE != "G" && ACCESSCODE != "S" && ACCESSCODE != "T" && ACCESSCODE != "")
