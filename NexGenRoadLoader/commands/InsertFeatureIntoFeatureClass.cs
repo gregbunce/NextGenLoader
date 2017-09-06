@@ -72,6 +72,10 @@ namespace NexGenRoadLoader.commands
                 string UTAHRD_UID = "";
                 string SOURCE = utransFeature.get_Value(utransFeature.Fields.FindField("SOURCE")).ToString().Trim();
                 var UPDATED = utransFeature.get_Value(utransFeature.Fields.FindField("MODIFYDATE")); //date field
+                string CREATOR = utransFeature.get_Value(utransFeature.Fields.FindField("CREATOR")).ToString().Trim();
+                string EDITOR = utransFeature.get_Value(utransFeature.Fields.FindField("EDITOR")).ToString().Trim();
+                var CREATED = utransFeature.get_Value(utransFeature.Fields.FindField("CREATE_DATE"));
+
                 //var EFFECTIVE; //date field
                 //var EXPIRE; //date field
                 string CUSTOMTAGS = "";
@@ -82,6 +86,7 @@ namespace NexGenRoadLoader.commands
                 if (NAME != "")
                 {
                     //if (NAME.Any(x => !char.IsLetter(x))) // True if it doesn't contain letters.  - old code
+                    // this was being coded via lambda expresstion but found that it was returning false values so i found this regex expression that does the trick.
                     if (Regex.IsMatch(NAME, @"[a-zA-Z]")) // true if NAME conatins at least one letter
                     {
                         // ALPHA FULLNAME
@@ -217,7 +222,7 @@ namespace NexGenRoadLoader.commands
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("ONEWAY"), ONEWAY);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("VERT_LEVEL"), VERT_LEVEL);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("SPEED_LMT"), SPEED_LMT);
-                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("ACCESSCODE"), ACCESSCODE);    
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("ACCESSCODE"), ACCESSCODE);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_HWYNAM"), DOT_HWYNAM);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_RTNAME"), DOT_RTNAME);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("DOT_RTPART"), DOT_RTPART);
@@ -247,6 +252,10 @@ namespace NexGenRoadLoader.commands
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("SOURCE"), SOURCE);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("UPDATED"), UPDATED);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("CUSTOMTAGS"), CUSTOMTAGS);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("CREATED"), CREATED);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("EDITOR"), EDITOR);
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("CREATOR"), CREATOR);
+
 
                     // Populate spatial assigned NextGenRoads' fields.
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("ZIPCODE_L"), spatialValues.Zip_L);
