@@ -93,16 +93,16 @@ namespace NexGenRoadLoader.commands
                         // CHECK IF HIGHWAY, IF SO..
                         if (NAME.Contains("HIGHWAY "))
                         {
-                            if (DOT_HWYNAM != "")
-                            {
-                                FULLNAME = DOT_HWYNAM;
-                            }
-                            else
-                            {
-                                FULLNAME = NAME;
-                                // Replace HIGHWAY WITH HWY.
-                                FULLNAME = FULLNAME.Replace("HIGHWAY", "HWY");
-                            }
+                            //if (DOT_HWYNAM != "")
+                            //{
+                                //FULLNAME = DOT_HWYNAM;
+                            //}
+                            //else
+                            //{
+                            FULLNAME = NAME;
+                            // Replace HIGHWAY WITH HWY.
+                            FULLNAME = FULLNAME.Replace("HIGHWAY", "HWY");
+                            //}
                         }
                         else
                         {
