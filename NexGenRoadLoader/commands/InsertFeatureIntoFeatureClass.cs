@@ -75,6 +75,8 @@ namespace NexGenRoadLoader.commands
                 string CREATOR = utransFeature.get_Value(utransFeature.Fields.FindField("CREATOR")).ToString().Trim();
                 string EDITOR = utransFeature.get_Value(utransFeature.Fields.FindField("EDITOR")).ToString().Trim();
                 var CREATED = utransFeature.get_Value(utransFeature.Fields.FindField("CREATE_DATE"));
+                string UTRANS_NOTES = utransFeature.get_Value(utransFeature.Fields.FindField("NOTES")).ToString().Trim();
+
 
                 //var EFFECTIVE; //date field
                 //var EXPIRE; //date field
@@ -255,7 +257,7 @@ namespace NexGenRoadLoader.commands
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("CREATED"), CREATED);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("EDITOR"), EDITOR);
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("CREATOR"), CREATOR);
-
+                    newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("UTRANS_NOTES"), UTRANS_NOTES);
 
                     // Populate spatial assigned NextGenRoads' fields.
                     newNexGenFeature.set_Value(newNexGenFeature.Fields.FindField("ZIPCODE_L"), spatialValues.Zip_L);
