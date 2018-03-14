@@ -61,7 +61,8 @@ namespace NexGenRoadLoader.loaders
 
                 // Get feature cursor of utrans roads to loop through 
                 //const string getUtransRoads = "WHERE STREETNAME = 'DONNER' or STREETNAME = 'EMIGRATION CANYON' or STREETNAME = 'CANYON'";
-                const string getUtransRoads = "WHERE CARTOCODE <> '99'";
+                //const string getUtransRoads = "WHERE CARTOCODE <> '99'";
+                const string getUtransRoads = "";
 
                 var roadsFilter = new QueryFilter
                 {
